@@ -1,0 +1,6 @@
+flask>=2.0.0
+flask-cors>=3.0.0
+torch>=1.9.0
+numpy>=1.20.0
+open3d>=0.15.0
+plotly>=5.0.0

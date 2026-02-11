@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weld Path Detection - 3D Visualization</title>
+    <meta name="description"
+        content="Upload CAD models and detect weld paths using deep learning with interactive 3D visualization">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header animate-fade-in">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                        <path d="M2 17l10 5 10-5" />
+                        <path d="M2 12l10 5 10-5" />
+                    </svg>
+                </div>
+                <h1>Weld Path Detection</h1>
+            </div>
+            <p class="tagline">AI-Powered 3D Weld Analysis • Multi-Architecture Support</p>
+        </header>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toast-container"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload Section -->
+            <section class="upload-section animate-slide-up" style="--delay: 0.1s">
+                <div class="upload-grid">
+                    <!-- CAD Upload -->
+                    <div class="upload-card" id="cad-upload-card">
+                        <div class="upload-header">
+                            <div class="upload-icon cad-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path
+                                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                                    <line x1="12" y1="22.08" x2="12" y2="12" />
+                                </svg>
+                            </div>
+                            <h3>CAD Model</h3>
+                            <span class="file-types">.PLY or .STL</span>
+                        </div>
+                        <div class="dropzone" id="cad-dropzone">
+                            <input type="file" id="cad-input" accept=".ply,.stl" hidden>
+                            <div class="dropzone-content">
+                                <div class="dropzone-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="17 8 12 3 7 8" />
+                                        <line x1="12" y1="3" x2="12" y2="15" />
+                                    </svg>
+                                </div>
+                                <p>Drag & drop or <span class="browse-link">browse</span></p>
+                            </div>
+                            <div class="file-info" id="cad-file-info" style="display: none;">
+                                <span class="file-name"></span>
+                                <span class="file-meta" id="cad-meta"></span>
+                                <button class="remove-btn" onclick="removeFile('cad')">×</button>
+                            </div>
+                            <div class="upload-progress" id="cad-progress" style="display: none;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="upload-status" id="cad-status"></div>
+                    </div>
+
+                    <!-- Model Upload -->
+                    <div class="upload-card" id="model-upload-card">
+                        <div class="upload-header">
+                            <div class="upload-icon model-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M12 6v6l4 2" />
+                                    <path d="M8 12a4 4 0 0 1 8 0" />
+                                </svg>
+                            </div>
+                            <h3>DL Model</h3>
+                            <span class="file-types">.PTH format</span>
+                        </div>
+                        <div class="dropzone" id="model-dropzone">
+                            <input type="file" id="model-input" accept=".pth" hidden>
+                            <div class="dropzone-content">
+                                <div class="dropzone-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="17 8 12 3 7 8" />
+                                        <line x1="12" y1="3" x2="12" y2="15" />
+                                    </svg>
+                                </div>
+                                <p>Drag & drop or <span class="browse-link">browse</span></p>
+                            </div>
+                            <div class="file-info" id="model-file-info" style="display: none;">
+                                <span class="file-name"></span>
+                                <span class="architecture-badge" id="arch-badge"></span>
+                                <button class="remove-btn" onclick="removeFile('model')">×</button>
+                            </div>
+                            <div class="upload-progress" id="model-progress" style="display: none;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="upload-status" id="model-status"></div>
+                    </div>
+                </div>
+
+                <!-- Process Button -->
+                <div class="process-section animate-slide-up" style="--delay: 0.2s">
+                    <button class="process-btn" id="process-btn" disabled>
+                        <span class="btn-text">Detect Weld Path</span>
+                        <span class="btn-loader">
+                            <svg class="spinner" viewBox="0 0 50 50">
+                                <circle cx="25" cy="25" r="20" fill="none" stroke-width="4" />
+                            </svg>
+                            Processing...
+                        </span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Visualization Section -->
+            <section class="visualization-section animate-slide-up" style="--delay: 0.3s">
+                <div class="viz-container glass-card">
+                    <div class="viz-header">
+                        <h2>3D Visualization</h2>
+                        <div class="stats-panel" id="stats-panel" style="display: none;">
+                            <div class="stat-item">
+                                <span class="stat-label">Architecture</span>
+                                <span class="stat-value arch-value" id="stat-arch">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Points</span>
+                                <span class="stat-value" id="stat-total">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Weld Points</span>
+                                <span class="stat-value weld-color" id="stat-weld">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Weld %</span>
+                                <span class="stat-value" id="stat-percentage">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Confidence</span>
+                                <span class="stat-value" id="stat-confidence">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="viz-content">
+                        <div id="plotly-container" class="plotly-container">
+                            <div class="placeholder" id="viz-placeholder">
+                                <div class="placeholder-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path
+                                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                                        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                                        <line x1="12" y1="22.08" x2="12" y2="12" />
+                                    </svg>
+                                </div>
+                                <p>Upload a CAD model and DL model to visualize weld paths</p>
+                                <p class="supported-models">Supported: PointNet++, HybridPointNet, Point Transformer,
+                                    KPConv</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer animate-fade-in" style="--delay: 0.4s">
+            <p>Weld Inspection System © 2026 • Multi-Architecture Deep Learning</p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <p class="loading-text" id="loading-text">Processing CAD Model...</p>
+            <p class="loading-subtext" id="loading-subtext">Running deep learning inference</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>
