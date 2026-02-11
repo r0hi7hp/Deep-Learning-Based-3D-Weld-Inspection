@@ -1,0 +1,21 @@
+name: defect_mapping
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - pytorch
+  - torchvision
+  - torchaudio
+  - cpuonly  # Remove this line if you have a GPU and want CUDA support
+  - trimesh
+  - tqdm
+  - pip
+  - pip:
+    - open3d
+    - plotly
