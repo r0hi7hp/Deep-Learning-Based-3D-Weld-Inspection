@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Introduction 
 TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
 
@@ -18,3 +19,7 @@ If you want to learn more about creating good readme files then refer the follow
 - [ASP.NET Core](https://github.com/aspnet/Home)
 - [Visual Studio Code](https://github.com/Microsoft/vscode)
 - [Chakra Core](https://github.com/Microsoft/ChakraCore)
+=======
+# Deep-Learning-Based-3D-Weld-Inspection
+An automated 3D weld inspection system ensuring manufacturing quality. It combines CAD-based tools for labeling weld seams with AI models for detecting defects. The project streamlines the workflow from data generation to final inspection.
+>>>>>>> ce3ac02e801a04a76c39f02a54b86a90c777ab1d
